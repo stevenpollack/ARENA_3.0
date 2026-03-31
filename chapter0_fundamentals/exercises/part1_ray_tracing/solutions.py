@@ -20,7 +20,24 @@ from tqdm import tqdm
 # Make sure exercises are in the path
 chapter = "chapter0_fundamentals"
 section = "part1_ray_tracing"
-root_dir = next(p for p in Path.cwd().parents if (p / chapter).exists())
+
+# Resolve root_dir relative to this file first, then fallback to cwd.
+current_file_dir = Path(__file__).resolve().parent
+root_dir = None
+for candidate in current_file_dir.parents:
+    if (candidate / chapter).exists():
+        root_dir = candidate
+        break
+
+if root_dir is None:
+    for candidate in Path.cwd().parents:
+        if (candidate / chapter).exists():
+            root_dir = candidate
+            break
+
+if root_dir is None:
+    raise FileNotFoundError(f"Could not locate repository root containing ` {chapter}` from {current_file_dir} or cwd {Path.cwd()}")
+
 exercises_dir = root_dir / chapter / "exercises"
 section_dir = exercises_dir / section
 if str(exercises_dir) not in sys.path:

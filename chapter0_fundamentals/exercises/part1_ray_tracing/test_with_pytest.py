@@ -2,14 +2,20 @@
 
 import os, sys
 from pathlib import Path
-exercises_dir = Path(__file__).parent.parent
-if str(exercises_dir) not in sys.path: sys.path.append(str(exercises_dir))
+exercises_dir = Path(__file__).resolve().parent.parent
+root_dir = exercises_dir.parent.parent
+
+# Ensure package imports work regardless of pytest CWD.
+for path in (str(exercises_dir), str(root_dir)):
+    if path not in sys.path:
+        sys.path.append(path)
 
 import torch as t
 import pytest
 from importlib.util import find_spec
 
 import part1_ray_tracing.solutions as solutions
+import part1_ray_tracing.answers as answers
 
 # Get a basic set of rays and segments
 rays = solutions.rays1d
@@ -29,7 +35,9 @@ B = t.tensor([2, -1.0, 0.0])
 C = t.tensor([2, 1.0, 1.0])
 triangle_rays = t.tensor([[[0.0, 0.0, 0.0], [1.0000, 0.3333, 0.3333]], [[0.0, 0.0, 0.0], [1.0, 1.0, -1.0]]])
 
-answers = find_spec("part1_ray_tracing.answers")
+# answers = find_spec("part1_ray_tracing.answers")
+
+print(answers)
 
 @pytest.mark.parametrize("rays, segments", [(rays, segments), (ray_parallel, segment_parallel)])
 def test_intersect_ray_1d(rays, segments):
